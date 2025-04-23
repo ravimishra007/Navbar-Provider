@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useNavbar } from "./NavbarProvider";
-import Navbar from "@/components/shared/Navbar";
+import RootNavbar from "@/components/RootNavbar";
 
 export default function NavbarController() {
   const pathname = usePathname();
@@ -17,5 +17,5 @@ export default function NavbarController() {
     }
   }, [pathname, setShowNavbar]);
 
-  return showNavbar ? <Navbar /> : null;
+  return showNavbar ? <RootNavbar /> : null;
 }

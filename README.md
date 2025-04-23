@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NavbarProvider
 
-## Getting Started
+A dynamic Navbar visibility controller for React/Next.js applications that allows you to show or hide the Navbar from anywhere in your app.
 
-First, run the development server:
+## Features
+- 🎯 Dynamic navbar visibility control
+- 🛡️ Automatic hiding on admin routes
+- 🔄 Programmatic toggling support
+- 📱 Perfect for full-screen experiences
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Implementation Guide
+
+
+# Step-by-Step: NavbarProvider Implementation
+### 1. Create the Context & Provider
+
+
+Create a new file `app/NavbarProvider.tsx`:
+
+```tsx
+"use client";
+
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type NavbarContextType = {
+  showNavbar: boolean;
+  setShowNavbar: (show: boolean) => void;
+};
+
+const NavbarContext = createContext<NavbarContextType | undefined>(undefined);
+
+export function NavbarProvider({ children }: { children: ReactNode }) {
+  const [showNavbar, setShowNavbar] = useState(true);
+
+  return (
+    <NavbarContext.Provider value={{ showNavbar, setShowNavbar }}>
+      {children}
+    </NavbarContext.Provider>
+  );
+}
+
+export function useNavbar() {
+  const context = useContext(NavbarContext);
+  if (!context) {
+    throw new Error("useNavbar must be used within a NavbarProvider");
+  }
+  return context;
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Wrap RootLayout with NavbarProvider
+# Update Root Layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Modify your `app/layout.tsx`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```tsx
+<html lang="en" suppressHydrationWarning>
+  <body className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 box-border`}>
+    <NavbarProvider>
+      <NavbarController />
+      <div className="overflow-hidden flex flex-col">
+        {children}
+      </div>
+    </NavbarProvider>
+    <Toaster position="top-center" reverseOrder={false} />
+  </body>
+</html>
+```
 
-## Learn More
+### 3. Create NavbarController
+This will read from context and conditionally render the Navbar:
 
-To learn more about Next.js, take a look at the following resources:
+Create `app/NavbarController.tsx`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```tsx
+"use client";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useNavbar } from "./NavbarProvider";
+import Navbar from "@/components/shared/Navbar";
 
-## Deploy on Vercel
+export default function NavbarController() {
+  const pathname = usePathname();
+  const { showNavbar, setShowNavbar } = useNavbar();
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  useEffect(() => {
+    if (pathname.startsWith("/admin")) {
+      setShowNavbar(false);
+    } else {
+      setShowNavbar(true);
+    }
+  }, [pathname, setShowNavbar]);
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  return showNavbar ? <Navbar /> : null;
+}
+```
+
+## Usage Examples
+
+### Toggle Navbar in a Specific Page
+# Now You Can Also Toggle Navbar Anywhere
+For example, if you want to hide the Navbar in a specific page or layout:
+
+
+```tsx
+"use client";
+
+import { useEffect } from "react";
+import { useNavbar } from "../NavbarProvider";
+
+export default function SomePage() {
+  const { setShowNavbar } = useNavbar();
+
+  useEffect(() => {
+    setShowNavbar(false);
+    return () => setShowNavbar(true); // Cleanup on unmount
+  }, []);
+
+  return <div>Full-screen experience here</div>;
+}
+```
+
