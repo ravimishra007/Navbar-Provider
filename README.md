@@ -121,17 +121,6 @@ export default function SomePage() {
 }
 ```
 
-
-## Uses & Benefits
-
-### Common Use Cases
-- 🖼️ Full-screen image galleries or slideshows
-- 🎮 Interactive game interfaces
-- 📊 Data visualization dashboards
-- 🎥 Video players and media viewers
-- 📱 Mobile-first immersive experiences
-- 🔒 Admin panels and protected routes
-
 ### Key Benefits
 - 🚀 **Better User Experience**: Toggle navigation when needed for distraction-free viewing
 - 🛠️ **Easy Integration**: Simple context-based implementation
